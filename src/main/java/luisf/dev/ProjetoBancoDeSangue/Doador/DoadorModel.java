@@ -1,11 +1,14 @@
 package luisf.dev.ProjetoBancoDeSangue.Doador;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import luisf.dev.ProjetoBancoDeSangue.Agendamento.AgendamentoModel;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_doador")
@@ -39,4 +42,8 @@ public class DoadorModel {
 
     @Column(name = "ultima_doacao")
     private LocalDate ultimaDoacao;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "doador")
+    private List<AgendamentoModel> agendamentos;
 }

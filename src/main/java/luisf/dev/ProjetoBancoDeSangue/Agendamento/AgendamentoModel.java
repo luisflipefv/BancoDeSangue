@@ -1,5 +1,6 @@
 package luisf.dev.ProjetoBancoDeSangue.Agendamento;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class AgendamentoModel {
     @Column(name = "status_agendamento", nullable = false)
     private StatusAgendamento status;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "doador_id")
     private DoadorModel doador;
