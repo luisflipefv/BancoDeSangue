@@ -27,7 +27,7 @@ public class AgendamentoModel {
     @Column(name = "status_agendamento", nullable = false)
     private StatusAgendamento status;
 
-    @JsonBackReference
+    @JsonBackReference("doador-agendamentos")
     @ManyToOne
     @JoinColumn(name = "doador_id")
     private DoadorModel doador;

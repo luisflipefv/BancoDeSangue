@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import luisf.dev.ProjetoBancoDeSangue.Agendamento.AgendamentoModel;
+import luisf.dev.ProjetoBancoDeSangue.Doacao.DoacaoModel;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 @Data
 public class DoadorModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -43,7 +44,11 @@ public class DoadorModel {
     @Column(name = "ultima_doacao")
     private LocalDate ultimaDoacao;
 
-    @JsonManagedReference
+    @JsonManagedReference("doador-agendamentos")
     @OneToMany(mappedBy = "doador")
     private List<AgendamentoModel> agendamentos;
+
+    @JsonManagedReference("doador-doacoes")
+    @OneToMany(mappedBy = "doador")
+    private List<DoacaoModel> doacoes;
 }
