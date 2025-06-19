@@ -1,4 +1,7 @@
 package luisf.dev.ProjetoBancoDeSangue.EstoqueDeSangue;
 
-public class EstoqueRepository {
+import luisf.dev.ProjetoBancoDeSangue.Doador.TipoSanguineo;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EstoqueRepository extends JpaRepository<EstoqueModel, TipoSanguineo> {
 }

@@ -1,4 +1,6 @@
 package luisf.dev.ProjetoBancoDeSangue.Doador;
 
-public interface DoadorRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DoadorRepository extends JpaRepository<DoadorModel, Long> {
 }
