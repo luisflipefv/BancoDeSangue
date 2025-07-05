@@ -1,5 +1,7 @@
 package luisf.dev.ProjetoBancoDeSangue.Doador;
 
+import luisf.dev.ProjetoBancoDeSangue.Agendamento.AgendamentoRepository;
+import luisf.dev.ProjetoBancoDeSangue.Doacao.DoacaoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -7,6 +9,14 @@ import java.util.List;
 @Service
 public class DoadorService {
     private DoadorRepository doadorRepository;
+    private AgendamentoRepository agendamentoRepository;
+    private DoacaoRepository doacaoRepository;
+
+    public DoadorService(DoadorRepository doadorRepository, AgendamentoRepository agendamentoRepository, DoacaoRepository doacaoRepository) {
+        this.doadorRepository = doadorRepository;
+        this.agendamentoRepository = agendamentoRepository;
+        this.doacaoRepository = doacaoRepository;
+    }
 
     public DoadorService(DoadorRepository doadorRepository) {
         this.doadorRepository = doadorRepository;
@@ -23,6 +33,9 @@ public class DoadorService {
     public void deletaDoador(Long id){
         if (!doadorRepository.existsById(id)){
             throw new IllegalArgumentException("Doador inválido");
+        }
+        if (agendamentoRepository.existsByDoadorId(id) || doacaoRepository.existsByDoadorId(id)){
+            throw new IllegalArgumentException("Não é possível excluir um doador com histórico de doações ou agendamento marcado");
         }
         doadorRepository.deleteById(id);
     }
