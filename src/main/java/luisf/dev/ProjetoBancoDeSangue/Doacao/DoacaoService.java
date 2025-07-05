@@ -1,13 +1,11 @@
 package luisf.dev.ProjetoBancoDeSangue.Doacao;
 
 import jakarta.transaction.Transactional;
-import luisf.dev.ProjetoBancoDeSangue.Agendamento.AgendamentoModel;
 import luisf.dev.ProjetoBancoDeSangue.Doador.DoadorModel;
 import luisf.dev.ProjetoBancoDeSangue.Doador.DoadorRepository;
 import luisf.dev.ProjetoBancoDeSangue.EstoqueDeSangue.EstoqueService;
 import org.springframework.stereotype.Service;
 
-import javax.swing.event.ListDataEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
