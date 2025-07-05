@@ -1,42 +1,49 @@
 package luisf.dev.ProjetoBancoDeSangue.Doacao;
 
+import jakarta.transaction.Transactional;
+import luisf.dev.ProjetoBancoDeSangue.Agendamento.AgendamentoModel;
+import luisf.dev.ProjetoBancoDeSangue.Doador.DoadorModel;
+import luisf.dev.ProjetoBancoDeSangue.Doador.DoadorRepository;
+import luisf.dev.ProjetoBancoDeSangue.EstoqueDeSangue.EstoqueService;
 import org.springframework.stereotype.Service;
 
+import javax.swing.event.ListDataEvent;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class DoacaoService {
     private DoacaoRepository doacaoRepository;
+    private DoadorRepository doadorRepository;
+    private EstoqueService estoqueService;
 
-    public DoacaoService(DoacaoRepository doacaoRepository) {
+    public DoacaoService(DoacaoRepository doacaoRepository, DoadorRepository doadorRepository, EstoqueService estoqueService) {
         this.doacaoRepository = doacaoRepository;
+        this.doadorRepository = doadorRepository;
+        this.estoqueService = estoqueService;
     }
 
+    @Transactional
     public DoacaoModel criaDoacao(DoacaoModel doacao){
-        return doacaoRepository.save(doacao);
-    }
-
-    public void deletaDoacao(Long id){
-        if (doacaoRepository.existsById(id)){
-            doacaoRepository.deleteById(id);
-        } else{
-            throw new IllegalArgumentException("Doação não encontrada: " + id);
+        DoadorModel doadorEncontrado = doadorRepository.findById(doacao.getDoador().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Doador não encontrado/cadastrado"));
+        if (doadorEncontrado.getUltimaDoacao() != null && doadorEncontrado.getUltimaDoacao().isAfter(LocalDate.now().minusMonths(3))){
+            throw new IllegalStateException("O doador " + doadorEncontrado.getNomeCompleto() + " nao pode realizar essa doação pois sua última doação foi há menos de 3 meses");
         }
-    }
+        DoacaoModel doacaoNova = new DoacaoModel();
+        doacaoNova.setDataDoacao(LocalDateTime.now());
+        doacaoNova.setDoador(doadorEncontrado);
+        doacaoNova.setQuantidadeMl(doacao.getQuantidadeMl());
+        doacaoRepository.save(doacaoNova);
 
-    public DoacaoModel alteraDoacao(Long id, DoacaoModel doacaoAtualizada){
-        return doacaoRepository.findById(id).map(doacaoExistente -> {
-            if (doacaoAtualizada.getDataDoacao() != null) {
-                doacaoExistente.setDataDoacao(doacaoAtualizada.getDataDoacao());
-            }
-            if (doacaoAtualizada.getDoador() != null){
-                doacaoExistente.setDoador(doacaoAtualizada.getDoador());
-            }
-            if (doacaoAtualizada.getQuantidadeMl() > 10){
-                doacaoExistente.setQuantidadeMl(doacaoAtualizada.getQuantidadeMl());
-            }
-            return doacaoRepository.save(doacaoExistente);
-        }).orElseThrow(() -> new RuntimeException("Não foi possível fazer a atualização"));
+        doadorEncontrado.setUltimaDoacao(LocalDate.now());
+        doadorRepository.save(doadorEncontrado);
+
+        if (doacao.getQuantidadeMl() >= 450 && doacao.getQuantidadeMl() <= 500){
+            estoqueService.incrementarEstoque(doacao.getDoador().getTipoSanguineo(), 1);
+        }
+        return doacaoNova;
     }
 
     public DoacaoModel consultaDoacaoPorId(Long id){
@@ -45,5 +52,9 @@ public class DoacaoService {
 
     public List<DoacaoModel> consultaTodasDoacoes(){
         return doacaoRepository.findAll();
+    }
+
+    public List<DoacaoModel> consultaDoacaoPorDoador(Long idDoador){
+        return doacaoRepository.findByDoadorId(idDoador);
     }
 }
